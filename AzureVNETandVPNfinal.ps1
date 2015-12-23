@@ -8,7 +8,7 @@
 ## including attorneys’ fees, that arise or result from the use or distribution of the Sample Code.
 ####
 ## Remove/comment the following line to enable this file run.
-#EXIT
+EXIT
 #Variables, modify as needed to change Azure Network Infrastructure naming and physical location
 $resourcegroup = 'NetworkInfrastructure' #Name of the Resource Group where Azure Networking Objects will be stored
 $location = 'West US' #Network Infrastructure Location
