@@ -25,12 +25,12 @@ Select-AzureRmSubscription -SubscriptionName $subscriptionname
 #Create a Resource Group for all associated objects
 New-AzureRmResourceGroup -Name $resourcegroup -Location $location
 #Creates a virtual network with 3 subnets
-$subnet1 = New-AzureRMVirtualNetworkSubnetConfig -Name 'InternalSubnet' -AddressPrefix '10.10.0.0/25'
-$subnet2 = New-AzureRMVirtualNetworkSubnetConfig -Name 'ExternalSubnet' -AddressPrefix '10.10.0.128/26'
-$subnet3 = New-AzureRMVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -AddressPrefix '10.10.0.240/28'
-New-AzureRmVirtualNetwork -Name $virtualnetwork -ResourceGroupName $resourcegroup -Location $location -AddressPrefix 10.10.0.0/24 -Subnet $subnet1, $subnet2, $subnet3
+$subnet1 = New-AzureRMVirtualNetworkSubnetConfig -Name 'InternalSubnet' -AddressPrefix '10.10.7.128/26'
+$subnet2 = New-AzureRMVirtualNetworkSubnetConfig -Name 'ExternalSubnet' -AddressPrefix '10.10.7.192/27'
+$subnet3 = New-AzureRMVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -AddressPrefix '10.10.7.240/28'
+New-AzureRmVirtualNetwork -Name $virtualnetwork -ResourceGroupName $resourcegroup -Location $location -AddressPrefix 10.10.7.128/25 -Subnet $subnet1, $subnet2, $subnet3
 #Creates Local Network Gateway, this references your On-Premise Network
-New-AzureRmLocalNetworkGateway -Name $localnetworkgateway -ResourceGroupName $resourcegroup -Location $location -GatewayIpAddress $onpremisegw -AddressPrefix '10.10.7.0/25' #@('10.0.0.0/24','20.0.0.0/24') Use this formatting for mutliple ranges
+New-AzureRmLocalNetworkGateway -Name $localnetworkgateway -ResourceGroupName $resourcegroup -Location $location -GatewayIpAddress $onpremisegw -AddressPrefix '10.10.7.2/25' #@('10.0.0.0/24','20.0.0.0/24') Use this formatting for mutliple ranges
 #Creates a Public IP Address for the Azure Gateway, this must be dynamically assigned and will not change
 $gwpip = New-AzureRmPublicIpAddress -Name $azurenetworkgatewayipaddress -ResourceGroupName $resourcegroup -Location $location -AllocationMethod Dynamic
 #Configures Azure Gateway Addressing
