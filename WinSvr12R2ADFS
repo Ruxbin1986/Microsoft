@@ -1,0 +1,12 @@
+#$getcertpw = Get-Credential -Message "Enter the certificate password."
+$cert = Read-Host "Enter Certificate Password" -AsSecureString
+$path = ($env:USERPROFILE).ToString() + "\Downloads\key.pfx"
+$certthumbprint = Import-PfxCertificate -FilePath $path -CertStoreLocation Cert:\LocalMachine\My\ -Password $cert | Select -ExpandProperty thumbprint
+Install-WindowsFeature -Name ADFS-Federation -IncludeAllSubFeature -IncludeManagementTools
+Import-Module ADFS
+# Get the credential used for performaing installation/configuration of ADFS
+$installationCredential = Get-Credential -Message "Enter the credential for the account used to create the trust between the ADFS Servers."
+Add-AdfsFarmNode `
+-CertificateThumbprint:$certthumbprint ` -Credential:$installationCredential `
+-GroupServiceAccountIdentifier:"RUXBIN\gmsaADFS`$" `
+-PrimaryComputerName:"name"
