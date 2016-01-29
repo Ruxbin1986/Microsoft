@@ -10,13 +10,18 @@
 ## Remove/comment the following line to enable this file run.
 EXIT
 #Variables, modify as needed to change Azure Network Infrastructure naming and physical location
-$resourcegroup = 'NetworkInfrastructure' #Name of the Resource Group where Azure Networking Objects will be stored
+$resourcegroup = 'InfrastructureWestUS' #Name of the Resource Group where Azure Networking Objects will be stored
 $location = 'West US' #Network Infrastructure Location
-$virtualnetwork = 'VNet0' #Virtual Network Name
-$localnetworkgateway = 'VNet0LocalNetworkGateway' #Local Network IP Addressing Range and On-Premise Gateway IP
-$azurenetworkgatewayipaddress = 'VNet0GatewayPublicIP' #Public IP of Azure Virtual Network Gateway
-$virtualnetworkgateway = 'VNet0Gateway' #Azure Virtual Network Gateway
-$virutalnetworkgatewayconnection = 'VNet0GatewayConnections' #Holds the Virutal Network Gateway IP and On-Premise GW IP Addresses
+$virtualnetwork = 'VNetWestUS0' #Virtual Network Name
+$localnetworkgateway = $virtualnetwork + 'LocalNetworkGateway' #Local Network IP Addressing Range and On-Premise Gateway IP
+$azurenetworkgatewayipaddress = $virtualnetwork + 'GatewayPublicIP' #Public IP of Azure Virtual Network Gateway
+$virtualnetworkgateway = $virtualnetwork + 'Gateway' #Azure Virtual Network Gateway
+$virutalnetworkgatewayconnection = $virtualnetwork + 'GatewayConnections' #Holds the Virutal Network Gateway IP and On-Premise GW IP Addresses
+$azureexternalsubnet = '10.10.7.128/26'
+$azureinternalsubnet = '10.10.7.192/27'
+$azuregatewaysubnet = '10.10.7.240/28'
+$azurenetwork = '10.10.7.128/25'
+$onpremisesnetwork = '10.10.7.0/25'
 $subscriptionname = 'Ruxbin' #Name of the Azure Subscription
 $onpremisegw = '1.2.3.4' #Public IP Address of On-Premise Router; ex Cisco ASA
 $sharedkey = 'abc123'
