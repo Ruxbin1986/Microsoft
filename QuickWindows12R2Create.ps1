@@ -8,12 +8,13 @@ $cred2=Get-Credential –Message "Now type the name (not including the domain) a
 $domaindns= Read-Host -Prompt "Domain FQDN ex; Contoso.com"
 $domacctdomain= Read-Host -Prompt "Shortname Domain, eg Contoso"
 $vm1 | Add-AzureProvisioningConfig -AdminUsername $cred1.GetNetworkCredential().Username -Password $cred1.GetNetworkCredential().Password -WindowsDomain -Domain $domacctdomain -DomainUserName $cred2.GetNetworkCredential().Username -DomainPassword $cred2.GetNetworkCredential().Password -JoinDomain $domaindns
-$vm1 | Set-AzureSubnet -SubnetNames "BackendSubnet"
+$subnet = Read-Host -Prompt "Subnet Name"
+$vm1 | Set-AzureSubnet -SubnetNames $subnet
 $disksize=20
 $disklabel="Database"
 $lun=0
 $hcaching="None"
 $vm1 | Add-AzureDataDisk -CreateNew -DiskSizeInGB $disksize -DiskLabel $disklabel -LUN $lun -HostCaching $hcaching
-$svcname="Ruxbin"
-$vnetname="Group InfrastructureCUSW-0 VNetCUSW-0"
+$svcname= Read-Host -Prompt "Cloud Service Name"
+$vnetname= Read-Host -Prompt "Virtual Network Name"
 New-AzureVM –ServiceName $svcname -VMs $vm1 -VNetName $vnetname
