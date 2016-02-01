@@ -1,0 +1,18 @@
+#
+# Windows PowerShell script for AD DS Deployment
+#
+
+Import-Module ADDSDeployment
+Install-ADDSDomainController `
+-NoGlobalCatalog:$false `
+-CreateDnsDelegation:$false `
+-CriticalReplicationOnly:$false `
+-DatabasePath "E:\NTDS" `
+-DomainName "Ruxbin.net" `
+-InstallDns:$true `
+-LogPath "E:\NTDS" `
+-NoRebootOnCompletion:$false `
+-SiteName "AzureCUSW-0" `
+-SysvolPath "E:\SYSVOL" `
+-Force:$true
+
