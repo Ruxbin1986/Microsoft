@@ -1,4 +1,4 @@
-﻿####
+####
 ## This Sample Code is provided for the purpose of illustration only and is not intended to be used in a production environment.  
 ## THIS SAMPLE CODE AND ANY RELATED INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, 
 ## INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.  
@@ -8,20 +8,15 @@
 ## including attorneys’ fees, that arise or result from the use or distribution of the Sample Code.
 ####
 ## Remove/comment the following line to enable this file run.
-EXIT
+#EXIT
 #Variables, modify as needed to change Azure Network Infrastructure naming and physical location
-$resourcegroup = 'InfrastructureWestUS' #Name of the Resource Group where Azure Networking Objects will be stored
+$resourcegroup = 'NetworkInfrastructure' #Name of the Resource Group where Azure Networking Objects will be stored
 $location = 'West US' #Network Infrastructure Location
-$virtualnetwork = 'VNetWestUS0' #Virtual Network Name
-$localnetworkgateway = $virtualnetwork + 'LocalNetworkGateway' #Local Network IP Addressing Range and On-Premise Gateway IP
-$azurenetworkgatewayipaddress = $virtualnetwork + 'GatewayPublicIP' #Public IP of Azure Virtual Network Gateway
-$virtualnetworkgateway = $virtualnetwork + 'Gateway' #Azure Virtual Network Gateway
-$virutalnetworkgatewayconnection = $virtualnetwork + 'GatewayConnections' #Holds the Virutal Network Gateway IP and On-Premise GW IP Addresses
-$azureexternalsubnet = '10.10.7.128/26'
-$azureinternalsubnet = '10.10.7.192/27'
-$azuregatewaysubnet = '10.10.7.240/28'
-$azurenetwork = '10.10.7.128/25'
-$onpremisesnetwork = '10.10.7.0/25'
+$virtualnetwork = 'VNet0' #Virtual Network Name
+$localnetworkgateway = 'VNet0LocalNetworkGateway' #Local Network IP Addressing Range and On-Premise Gateway IP
+$azurenetworkgatewayipaddress = 'VNet0GatewayPublicIP' #Public IP of Azure Virtual Network Gateway
+$virtualnetworkgateway = 'VNet0Gateway' #Azure Virtual Network Gateway
+$virutalnetworkgatewayconnection = 'VNet0GatewayConnections' #Holds the Virutal Network Gateway IP and On-Premise GW IP Addresses
 $subscriptionname = 'Ruxbin' #Name of the Azure Subscription
 $onpremisegw = '1.2.3.4' #Public IP Address of On-Premise Router; ex Cisco ASA
 $sharedkey = 'abc123'
@@ -30,12 +25,12 @@ Select-AzureRmSubscription -SubscriptionName $subscriptionname
 #Create a Resource Group for all associated objects
 New-AzureRmResourceGroup -Name $resourcegroup -Location $location
 #Creates a virtual network with 3 subnets
-$subnet1 = New-AzureRMVirtualNetworkSubnetConfig -Name 'InternalSubnet' -AddressPrefix '10.10.7.128/26'
-$subnet2 = New-AzureRMVirtualNetworkSubnetConfig -Name 'ExternalSubnet' -AddressPrefix '10.10.7.192/27'
-$subnet3 = New-AzureRMVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -AddressPrefix '10.10.7.240/28'
-New-AzureRmVirtualNetwork -Name $virtualnetwork -ResourceGroupName $resourcegroup -Location $location -AddressPrefix 10.10.7.128/25 -Subnet $subnet1, $subnet2, $subnet3
+$subnet1 = New-AzureRMVirtualNetworkSubnetConfig -Name 'InternalSubnet' -AddressPrefix '10.10.0.0/25'
+$subnet2 = New-AzureRMVirtualNetworkSubnetConfig -Name 'ExternalSubnet' -AddressPrefix '10.10.0.128/26'
+$subnet3 = New-AzureRMVirtualNetworkSubnetConfig -Name 'GatewaySubnet' -AddressPrefix '10.10.0.240/28'
+New-AzureRmVirtualNetwork -Name $virtualnetwork -ResourceGroupName $resourcegroup -Location $location -AddressPrefix 10.10.0.0/24 -Subnet $subnet1, $subnet2, $subnet3
 #Creates Local Network Gateway, this references your On-Premise Network
-New-AzureRmLocalNetworkGateway -Name $localnetworkgateway -ResourceGroupName $resourcegroup -Location $location -GatewayIpAddress $onpremisegw -AddressPrefix '10.10.7.2/25' #@('10.0.0.0/24','20.0.0.0/24') Use this formatting for mutliple ranges
+New-AzureRmLocalNetworkGateway -Name $localnetworkgateway -ResourceGroupName $resourcegroup -Location $location -GatewayIpAddress $onpremisegw -AddressPrefix '10.10.7.0/25' #@('10.0.0.0/24','20.0.0.0/24') Use this formatting for mutliple ranges
 #Creates a Public IP Address for the Azure Gateway, this must be dynamically assigned and will not change
 $gwpip = New-AzureRmPublicIpAddress -Name $azurenetworkgatewayipaddress -ResourceGroupName $resourcegroup -Location $location -AllocationMethod Dynamic
 #Configures Azure Gateway Addressing
