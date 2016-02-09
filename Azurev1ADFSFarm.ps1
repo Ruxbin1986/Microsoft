@@ -22,6 +22,7 @@ $credlocal=Get-Credential –Message "Type the name and password of the local ad
 $creddomain=Get-Credential –Message "Now type the name (not including the domain) and password of an account that has permission to add the machine to the domain."
 $domaindns= Read-Host -Prompt "Domain FQDN ex; Contoso.com"
 $domacctdomain= Read-Host -Prompt "Shortname Domain, eg Contoso"
+$instancesize = "Medium"
 #Retrives lastest Windows Server 2012 R2 Image
 $family= "Windows Server 2012 R2 Datacenter"
 $image=Get-AzureVMImage | where { $_.ImageFamily -eq $family } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1
@@ -30,5 +31,28 @@ Get-AzureVMImage | where { $_.ImageName -eq $image } | fl ImageFamily, Published
 #Provisioning New Cloud Services
 Write-Host "Provisioning New Cloud Services"
 New-AzureService -ServiceName $adfscsname -Location $location
-New-AzureService -ServiceName $adfscsname -Location $location
+New-AzureService -ServiceName $wapcsname -Location $location
 Write-Host "Cloud Services Provisioned, creating VMs..."
+#Creates VM Objects
+Write-Host "Creating VM Configuration Objects..."
+$adfs0= New-AzureVMConfig -Name $adfsname0 -InstanceSize "Standard_D1" -ImageName $image -AvailabilitySetName $adfsavname
+$adfs1= New-AzureVMConfig -Name $adfsname1 -InstanceSize "Standard_D1" -ImageName $image -AvailabilitySetName $adfsavname
+$wap0= New-AzureVMConfig -Name $wapname0 -InstanceSize "Standard_D1" -ImageName $image -AvailabilitySetName $wapavname
+$wap1= New-AzureVMConfig -Name $wapname1 -InstanceSize "Standard_D1" -ImageName $image -AvailabilitySetName $wapavname
+#Add Provisioing Configuration
+Write-Host "Creating VM Provisioning Objects"
+$adfs0 | Add-AzureProvisioningConfig -AdminUsername $credlocal.GetNetworkCredential().Username -Password $credlocal.GetNetworkCredential().Password -WindowsDomain -Domain $domacctdomain -DomainUserName $creddomain.GetNetworkCredential().Username -DomainPassword $creddomain.GetNetworkCredential().Password -JoinDomain $domaindns
+$adfs1 | Add-AzureProvisioningConfig -AdminUsername $credlocal.GetNetworkCredential().Username -Password $credlocal.GetNetworkCredential().Password -WindowsDomain -Domain $domacctdomain -DomainUserName $creddomain.GetNetworkCredential().Username -DomainPassword $creddomain.GetNetworkCredential().Password -JoinDomain $domaindns
+$wap0 | Add-AzureProvisioningConfig -Windows -AdminUsername $credlocal.GetNetworkCredential().Username -Password $credlocal.GetNetworkCredential().Password
+$wap1 | Add-AzureProvisioningConfig -Windows -AdminUsername $credlocal.GetNetworkCredential().Username -Password $credlocal.GetNetworkCredential().Password
+#Defines appropriate subnet
+$adfs0 | Set-AzureSubnet -SubnetNames $vnetbackend
+$adfs1 | Set-AzureSubnet -SubnetNames $vnetbackend
+$wap0 | Set-AzureSubnet -SubnetNames $vnetfrontend
+$wap1 | Set-AzureSubnet -SubnetNames $vnetfrontend
+Write-Host "Deploying VMs..."
+#Deploys VMs
+New-AzureVM –ServiceName $adfscsname -VMs $adfs0 -VNetName $vnetname
+New-AzureVM –ServiceName $adfscsname -VMs $adfs1 -VNetName $vnetname
+New-AzureVM –ServiceName $wapcsname -VMs $wap0 -VNetName $vnetname
+New-AzureVM –ServiceName $wapcsname -VMs $wap1 -VNetName $vnetname
