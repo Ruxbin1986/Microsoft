@@ -6,23 +6,24 @@ Write-Host "Roles/Features will be installed but will require manual Configurati
 Write-Host "Assumes 2S2/Express Route is configured with appropriate Azure VNET DNS Settings"
 Write-Host "Assumes Correct Azure Subscription and Storage Account selected"
 Write-Host "----------------------------------------------------------------------"
-$adfsname0 = Read-Host "Enter the name of the first Azure ADFS Server"
-$adfsname1 = Read-Host "Enter the name of the second Azure ADFS Server"
-$adfsavname = Read-Host "Enter the name of the ADFS Server Availiblity Set"
-$wapname0 = Read-Host "Enter the name of the first Azure WAP Server"
-$wapname1 = Read-Host "Enter the name of the second Azure WAP Server"
-$wapavname = Read-Host "Enter the name of the WAP Server Availibility Set"
-$adfscsname = Read-Host "Enter the name of the ADFS Cloud Service, example Contoso"
-$wapcsname = Read-host "Enter the name of the WAP Cloud Service"
-$vnetname = Read-host "Enter the name of Azure Virtual Network"
-$location = Read-host "Enter location, example West US"
-$vnetbackend = Read-host "Enter the name of backend subnet, ADFS Servers will be deployed here"
-$vnetfrontend = Read-host "Enter the name of the frontend subnet, WAP Servers will be deployed here"
+$adfsname0 = "RADFS0T" # Read-Host "Enter the name of the first Azure ADFS Server"
+$adfsname1 = "RADFS1T" # Read-Host "Enter the name of the second Azure ADFS Server"
+$adfsavname = "RADFSAV" # Read-Host "Enter the name of the ADFS Server Availiblity Set"
+$wapname0 = "RWAP0T" # Read-Host "Enter the name of the first Azure WAP Server"
+$wapname1 = "RWAP1T" # Read-Host "Enter the name of the second Azure WAP Server"
+$wapavname = "RWAPAV" # Read-Host "Enter the name of the WAP Server Availibility Set"
+$adfscsname = "ruxbincsusw-1" # Read-Host "Enter the name of the ADFS Cloud Service, example Contoso"
+$wapcsname = "ruxbincsusw-2" # Read-host "Enter the name of the WAP Cloud Service"
+$vnetname = "Group InfrastructureCUSW-0 VNetCUSW-0" # Read-host "Enter the name of Azure Virtual Network"
+$location = "West US" # Read-host "Enter location, example West US"
+$vnetbackend = "FrontendSubnet" # Read-host "Enter the name of backend subnet, ADFS Servers will be deployed here"
+$vnetfrontend = "BackendSubnet" # Read-host "Enter the name of the frontend subnet, WAP Servers will be deployed here"
 $credlocal=Get-Credential –Message "Type the name and password of the local administrator account."
 $creddomain=Get-Credential –Message "Now type the name (not including the domain) and password of an account that has permission to add the machine to the domain."
-$domaindns= Read-Host -Prompt "Domain FQDN ex; Contoso.com"
-$domacctdomain= Read-Host -Prompt "Shortname Domain, eg Contoso"
-$instancesize = "Medium"
+$domaindns= "Ruxbin.net" # Read-Host -Prompt "Domain FQDN ex; Contoso.com"
+$domacctdomain= "Ruxbin" # Read-Host -Prompt "Shortname Domain, eg Contoso"
+$ilbstaticvp = "10.10.8.121" # Read-Host -Prompt "ADFS Internal Load Balancer Public IP"
+$ilbname = "ADFSLB-0"
 #Retrives lastest Windows Server 2012 R2 Image
 $family= "Windows Server 2012 R2 Datacenter"
 $image=Get-AzureVMImage | where { $_.ImageFamily -eq $family } | sort PublishedDate -Descending | select -ExpandProperty ImageName -First 1
@@ -51,8 +52,14 @@ $adfs1 | Set-AzureSubnet -SubnetNames $vnetbackend
 $wap0 | Set-AzureSubnet -SubnetNames $vnetfrontend
 $wap1 | Set-AzureSubnet -SubnetNames $vnetfrontend
 Write-Host "Deploying VMs..."
+#Defines Internal Load Balancer for ADFS
+Add-AzureInternalLoadBalancer -ServiceName $adfscsname -InternalLoadBalancerName $ilbname -SubnetName $vnetbackend -StaticVNetIPAddress $ilbstaticvp
 #Deploys VMs
-New-AzureVM –ServiceName $adfscsname -VMs $adfs0 -VNetName $vnetname
+New-AzureVM –ServiceName $adfscsname -VMs $adfs0 -VNetName $vnetname 
 New-AzureVM –ServiceName $adfscsname -VMs $adfs1 -VNetName $vnetname
 New-AzureVM –ServiceName $wapcsname -VMs $wap0 -VNetName $vnetname
 New-AzureVM –ServiceName $wapcsname -VMs $wap1 -VNetName $vnetname
+#$adfs0 | Add-AzureEndpoint -Name "ADFS-ILB" –LBSetName “ADFS-HTTPS” -Protocol "tcp" -LocalPort "443" -PublicPort "443" –DefaultProbe -InternalLoadBalancerName $ilbname
+#$adfs1 | Add-AzureEndpoint -Name "ADFS-ILB" –LBSetName “ADFS-HTTPS” -Protocol "tcp" -LocalPort "443" -PublicPort "443" –DefaultProbe -InternalLoadBalancerName $ilbname
+$wap0 | 
+$wap1 |
