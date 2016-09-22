@@ -1,17 +1,17 @@
-$ResourceGroupName = "example"
+$ResourceGroup = "example"
 $location = "eastus"
 $StorageAccount = "storage"
-$InterfaceName = "Netint14"
-$Subnet1Name = "FrontSubnet"
-$VNetName = "vnetUSEast"
 $VMName = "Example01"
+$Interface = $VMname + "NIC"
+$Subnet = "FrontSubnet"
+$VNet = "vnetUSEast"
 $osdisk = "osdisk1"
-$vnet = Get-AzureRmVirtualNetwork -Name VNetUSEast -ResourceGroupName ""
-$Interface = New-AzureRmNetworkInterface -Name $InterfaceName -ResourceGroupName $ResourceGroupName -Location "eastus" -SubnetId $VNet.Subnets[0].Id
+$vnet = Get-AzureRmVirtualNetwork -Name $vnet -ResourceGroupName $resourcegroup
+$Interface = New-AzureRmNetworkInterface -Name $Interface -ResourceGroupName $ResourceGroup -Location "eastus" -SubnetId $VNet.Subnets[0].Id
 $VMSize = "Standard_A2"
 $VirtualMachine = New-AzureRmVMConfig -VMName $VMName -VMSize $VMSize
 $VirtualMachine = Add-AzureRmVMNetworkInterface -VM $VirtualMachine -Id $Interface.Id
-$StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName "okok"
+$StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroup
 $OSDiskUri = $StorageAccount.PrimaryEndpoints.Blob.ToString() + "vhds/" + $OSDisk + ".vhd"
 $VirtualMachine = Set-AzureRmVMOSDisk -VM $VirtualMachine -Name $osdisk -VhdUri $OSDiskUri -CreateOption Attach -Windows
-New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine 
+New-AzureRmVM -ResourceGroupName $ResourceGroupName -Location $Location -VM $VirtualMachine
